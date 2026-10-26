@@ -5,8 +5,11 @@ plugins {
 }
 
 android {
-    namespace "com.sg.qr_reader"
-    compileSdkVersion flutter.compileSdkVersion
+    namespace "com.soundgraph.flow.qrreader"
+    // Explicit 36, not flutter.compileSdkVersion — org-wide standard value
+    // (see flowhub/pickup_table, already on 36), independent of whichever
+    // Flutter version happens to be active when building.
+    compileSdkVersion 36
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -19,7 +22,13 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.sg.qr_reader"
+        applicationId "com.soundgraph.flow.qrreader"
+        // Org-wide standard value (see flowhub/pickup_table/etc.) — 23
+        // covers the oldest device in the fleet (Android 6 FrameTV).
+        // Enforced redundantly below (afterEvaluate + androidComponents.
+        // beforeVariants) — Flutter's own Gradle plugin was seen silently
+        // overriding a single declaration here on its own, so all three
+        // layers stay in place together.
         def targetMin = 23
         minSdkVersion targetMin
         targetSdkVersion flutter.targetSdkVersion
@@ -27,9 +36,44 @@ android {
         versionName flutter.versionName
     }
 
+    // Same dev/prod split as CafeBeta-Kiosk (android/app/build.gradle.kts)
+    // — a dev build gets its own applicationId (installable side-by-side
+    // with prod) and app name, driven by main_dev.dart/main_prod.dart.
+    flavorDimensions "env"
+    productFlavors {
+        dev {
+            dimension "env"
+            applicationIdSuffix ".dev"
+            versionNameSuffix "-dev"
+            resValue "string", "app_name", "Cafe Beta QrReader Dev"
+        }
+        prod {
+            dimension "env"
+            resValue "string", "app_name", "Cafe Beta QrReader"
+        }
+    }
+
     buildTypes {
         release {
             signingConfig signingConfigs.debug
+        }
+    }
+
+    // Renames the output APK from Flutter's default (app-dev-release.apk /
+    // app-prod-release.apk) to
+    // CafeBeta_QrReader_<versionName>.<versionCode, zero-padded>-<flavor>.apk
+    // — see flowhub/android/app/build.gradle.kts for the fleet-wide
+    // convention this mirrors (A.BC.MMDD versionName + NN versionCode, both
+    // from pubspec.yaml, bumped by hand before each build). versionName
+    // already carries flavor's own "-dev" suffix (see productFlavors
+    // above), so this only adds the flavor name itself for prod builds.
+    // Uses the older applicationVariants API (not androidComponents.
+    // onVariants) — the newer Variant API's `output.outputFileName` didn't
+    // resolve against this project's AGP version.
+    applicationVariants.all { variant ->
+        variant.outputs.all { output ->
+            output.outputFileName =
+                "CafeBeta_QrReader_${variant.versionName}.${variant.versionCode.toString().padLeft(2, '0')}-${variant.flavorName}.apk"
         }
     }
 }
