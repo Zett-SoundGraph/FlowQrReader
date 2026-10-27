@@ -104,8 +104,12 @@ Both entrypoints: `WidgetsFlutterBinding.ensureInitialized()` →
 Env.prod())` → `SystemChrome.setEnabledSystemUIMode(immersiveSticky)` →
 `runApp(ScannerApp)` (home = `DeviceRoleGate`).
 
-Output APK filename: `CafeBeta_QrReader_<version>.<buildNumber>-<flavor>.apk`
-(see `android/app/build.gradle`'s `applicationVariants.all` block).
+Output APK filename: `CafeBeta_QrReader_<flavor>_<version>.<buildNumber>.apk`
+(see `android/app/build.gradle`'s `applicationVariants.all` block). Use
+`./scripts/build_apk.sh <flavor>` instead of the raw `flutter build apk`
+command above to get this filename plus auto-versioning by date + same-day
+build count (see section 7.4) and a copy exported to `~/Documents/
+CafeBeta_QrReader`.
 
 ### 5.1 Auto-start and watchdog
 
@@ -172,15 +176,15 @@ Add new public files to the matching `index.dart` in the same change.
 
 ### 7.4 Version Naming Rule
 
-`pubspec.yaml` version format: `MAJOR.MINOR.DATE+BUILD`
+`pubspec.yaml` version format: `MAJOR.MINOR.YYMMDD+YYMMDDBUILD`
 
 ```yaml
-version: 0.10.1004+01
+version: 0.10.261027+26102701
 ```
 
 - `MAJOR`: breaking release line
 - `MINOR`: feature milestone line
-- `DATE`: release date (`MMDD`)
+- `YYMMDD`: release date, repeated at the start of the build number
 - `BUILD`: same-day build count — bump by hand before every same-day rebuild
 
 ## 8. Common Troubleshooting
