@@ -4,9 +4,14 @@
 /// [label] is only shown on this device's own role-picker screen, never
 /// published anywhere.
 enum DeviceRole {
-  brew('scanner-order-01', 'Scanner Brew', 'Brew'),
-  call('scanner-complete-01', 'Scanner Call', 'Call'),
-  pickup('scanner-customer-01', 'Scanner Pickup', 'Pickup');
+  // deviceId stays a lowercase/hyphenated slug — it's embedded directly into
+  // MQTT topic paths (beta/system/heartbeat/<deviceId>) and is also what
+  // _topicForRole prefix-matches on, so it has to stay stable and
+  // topic-safe. label is the free-form "pretty" string shown only on this
+  // device's own role-picker screen, never published anywhere.
+  brew('flow-qr-reader-brew', 'Flow QR Reader Brew', 'Brew'),
+  call('flow-qr-reader-call', 'Flow QR Reader Call', 'Call'),
+  pickup('flow-qr-reader-pickup', 'Flow QR Reader Pickup', 'Pickup');
 
   const DeviceRole(this.deviceId, this.label, this.scanCode);
 

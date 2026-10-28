@@ -15,6 +15,10 @@ class DeviceIdentity {
 
   static void apply(DeviceRole role) {
     deviceId = role.deviceId;
-    deviceName = role.deviceId;
+    // Was role.deviceId here too (pre-existing bug) — deviceName always
+    // published the same lowercase/hyphenated slug as deviceId instead of
+    // the actual pretty label, e.g. "flow-qr-reader-brew" instead of
+    // "Flow QR Reader Brew".
+    deviceName = role.label;
   }
 }

@@ -43,3 +43,6 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# scripts/build_apk.sh's same-day build counter (local to this machine)
+.build_number.local

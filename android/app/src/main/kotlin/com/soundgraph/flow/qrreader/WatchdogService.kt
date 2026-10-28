@@ -1,4 +1,4 @@
-package com.sg.qr_reader
+package com.soundgraph.flow.qrreader
 
 import android.app.Notification
 import android.app.NotificationChannel

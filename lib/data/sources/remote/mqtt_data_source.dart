@@ -106,13 +106,13 @@ class MqttDataSource implements IMqttDataSource {
   }
 
   // Which topic a scan publishes to is derived from this device's own
-  // deviceId (scanner-order-01 / scanner-complete-01 / scanner-customer-01)
-  // — hardcoding this to one topic regardless of role would send a
-  // complete/customer station's scans to the order topic instead.
+  // deviceId (flow-qr-reader-brew / call / pickup) — hardcoding this to one
+  // topic regardless of role would send a Call/Pickup station's scans to
+  // the order topic instead.
   String get _topicForRole {
     final id = NetworkConstants.mqttDeviceId;
-    if (id.startsWith('scanner-complete')) return 'beta/qr/complete';
-    if (id.startsWith('scanner-customer')) return 'beta/qr/customer';
+    if (id.startsWith('flow-qr-reader-call')) return 'beta/qr/complete';
+    if (id.startsWith('flow-qr-reader-pickup')) return 'beta/qr/customer';
     return 'beta/qr/order';
   }
 
