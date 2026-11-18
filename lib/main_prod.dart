@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:qr_reader/core/constants/index.dart';
 import 'package:qr_reader/core/di/index.dart';
 import 'package:qr_reader/core/env/env.dart';
+import 'package:qr_reader/data/platform/flow_updater_service.dart';
 import 'package:qr_reader/presentation/screens/index.dart';
 
 void main() {
@@ -20,7 +23,16 @@ void main() {
   LocalSubnetResolver.resolve();
   setupLocator(Env.prod());
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+  // Don't await it before runApp: if FlowUpdater is missing, startup must not
+  // wait. The SDK keeps reconnecting in the background either way.
+  final FlowUpdaterService updater = getIt<FlowUpdaterService>();
+  unawaited(updater.connect());
   runApp(const ScannerApp());
+  // UI is up: report ready for FlowUpdater's IPC_READY health check once the
+  // first frame is drawn (same timing as FlowKioskApp).
+  WidgetsBinding.instance.addPostFrameCallback(
+    (_) => unawaited(updater.markReady()),
+  );
 }
 
 class ScannerApp extends StatelessWidget {

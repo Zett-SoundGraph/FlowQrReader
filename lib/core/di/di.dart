@@ -3,6 +3,7 @@ import 'package:injectable/injectable.dart';
 import 'package:qr_reader/core/di/di.config.dart';
 import 'package:qr_reader/core/di/service_locator.dart';
 import 'package:qr_reader/core/env/env.dart';
+import 'package:qr_reader/data/platform/flow_updater_service.dart';
 
 export 'package:qr_reader/core/di/service_locator.dart';
 
@@ -13,5 +14,8 @@ export 'package:qr_reader/core/di/service_locator.dart';
 )
 void setupLocator(Env env) {
   getIt.registerSingleton<Env>(env);
+  // One FlowUpdater link for the whole app (see FlowUpdaterService). Registered
+  // by hand, like FlowKioskApp, before the generated graph that depends on it.
+  getIt.registerSingleton<FlowUpdaterService>(FlowUpdaterService());
   $initGetIt(getIt);
 }

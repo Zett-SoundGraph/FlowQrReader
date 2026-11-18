@@ -12,14 +12,20 @@
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 
+import '../../data/platform/flow_updater_service.dart' as _i21;
+import '../../data/repositories/device_repository_impl.dart' as _i34;
 import '../../data/repositories/device_role_repository_impl.dart' as _i1006;
 import '../../data/repositories/scanner_repository_impl.dart' as _i818;
 import '../../data/sources/local/device_role_data_source.dart' as _i531;
 import '../../data/sources/remote/barcode_scan_data_source.dart' as _i293;
 import '../../data/sources/remote/mqtt_data_source.dart' as _i126;
+import '../../domain/repositories/device_repository.dart' as _i454;
 import '../../domain/repositories/device_role_repository.dart' as _i544;
 import '../../domain/repositories/scanner_repository.dart' as _i846;
 import '../../domain/usecases/connect_mqtt_usecase.dart' as _i151;
+import '../../domain/usecases/device/get_device_info_usecase.dart' as _i677;
+import '../../domain/usecases/device/observe_device_info_changed_usecase.dart'
+    as _i373;
 import '../../domain/usecases/get_saved_device_role_usecase.dart' as _i98;
 import '../../domain/usecases/index.dart' as _i447;
 import '../../domain/usecases/observe_connection_usecase.dart' as _i528;
@@ -40,11 +46,20 @@ _i174.GetIt $initGetIt(
   gh.singleton<_i293.IBarcodeScanDataSource>(
     () => _i293.BarcodeScanDataSource(),
   );
+  gh.lazySingleton<_i454.DeviceRepository>(
+    () => _i34.DeviceRepositoryImpl(gh<_i21.FlowUpdaterService>()),
+  );
   gh.singleton<_i846.ScannerRepository>(
     () => _i818.ScannerRepositoryImpl(
       gh<_i293.IBarcodeScanDataSource>(),
       gh<_i126.IMqttDataSource>(),
     ),
+  );
+  gh.factory<_i677.GetDeviceInfoUsecase>(
+    () => _i677.GetDeviceInfoUsecase(gh<_i454.DeviceRepository>()),
+  );
+  gh.factory<_i373.ObserveDeviceInfoChangedUsecase>(
+    () => _i373.ObserveDeviceInfoChangedUsecase(gh<_i454.DeviceRepository>()),
   );
   gh.singleton<_i544.DeviceRoleRepository>(
     () => _i1006.DeviceRoleRepositoryImpl(gh<_i531.IDeviceRoleDataSource>()),
@@ -73,6 +88,8 @@ _i174.GetIt $initGetIt(
       gh<_i447.ObserveConnectionUsecase>(),
       gh<_i447.ObserveScanUsecase>(),
       gh<_i447.PublishScanUsecase>(),
+      gh<_i677.GetDeviceInfoUsecase>(),
+      gh<_i373.ObserveDeviceInfoChangedUsecase>(),
     ),
   );
   return getIt;
