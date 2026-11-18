@@ -23,9 +23,6 @@ import '../../domain/repositories/device_repository.dart' as _i454;
 import '../../domain/repositories/device_role_repository.dart' as _i544;
 import '../../domain/repositories/scanner_repository.dart' as _i846;
 import '../../domain/usecases/connect_mqtt_usecase.dart' as _i151;
-import '../../domain/usecases/device/get_device_info_usecase.dart' as _i677;
-import '../../domain/usecases/device/observe_device_info_changed_usecase.dart'
-    as _i373;
 import '../../domain/usecases/get_saved_device_role_usecase.dart' as _i98;
 import '../../domain/usecases/index.dart' as _i447;
 import '../../domain/usecases/observe_connection_usecase.dart' as _i528;
@@ -55,12 +52,6 @@ _i174.GetIt $initGetIt(
       gh<_i126.IMqttDataSource>(),
     ),
   );
-  gh.factory<_i677.GetDeviceInfoUsecase>(
-    () => _i677.GetDeviceInfoUsecase(gh<_i454.DeviceRepository>()),
-  );
-  gh.factory<_i373.ObserveDeviceInfoChangedUsecase>(
-    () => _i373.ObserveDeviceInfoChangedUsecase(gh<_i454.DeviceRepository>()),
-  );
   gh.singleton<_i544.DeviceRoleRepository>(
     () => _i1006.DeviceRoleRepositoryImpl(gh<_i531.IDeviceRoleDataSource>()),
   );
@@ -88,8 +79,7 @@ _i174.GetIt $initGetIt(
       gh<_i447.ObserveConnectionUsecase>(),
       gh<_i447.ObserveScanUsecase>(),
       gh<_i447.PublishScanUsecase>(),
-      gh<_i677.GetDeviceInfoUsecase>(),
-      gh<_i373.ObserveDeviceInfoChangedUsecase>(),
+      gh<_i454.DeviceRepository>(),
     ),
   );
   return getIt;

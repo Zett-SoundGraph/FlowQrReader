@@ -4,8 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 
 import 'package:qr_reader/core/utils/log.dart';
-import 'package:qr_reader/domain/usecases/device/get_device_info_usecase.dart';
-import 'package:qr_reader/domain/usecases/device/observe_device_info_changed_usecase.dart';
+import 'package:qr_reader/domain/repositories/device_repository.dart';
 import 'package:qr_reader/domain/usecases/index.dart';
 import 'package:qr_reader/presentation/cubit/scanner_state.dart';
 
@@ -16,8 +15,7 @@ class ScannerCubit extends Cubit<ScannerState> {
     this._observeConnection,
     this._observeScan,
     this._publishScan,
-    this._getDeviceInfo,
-    this._observeDeviceInfoChanged,
+    this._deviceRepository,
   ) : super(const ScannerState()) {
     _connectionSubscription = _observeConnection().listen((connected) {
       emit(state.copyWith(isConnected: connected));
@@ -26,7 +24,7 @@ class ScannerCubit extends Cubit<ScannerState> {
     _scanSubscription = _observeScan().listen(_handleScan);
     unawaited(_connectMqtt());
     unawaited(_loadDeviceInfo());
-    _deviceInfoChangedSubscription = _observeDeviceInfoChanged().listen(
+    _deviceInfoChangedSubscription = _deviceRepository.deviceInfoChanges.listen(
       (_) => unawaited(_loadDeviceInfo()),
     );
   }
@@ -37,8 +35,7 @@ class ScannerCubit extends Cubit<ScannerState> {
   final PublishScanUsecase _publishScan;
 
   // FlowUpdater link: the device record is only logged for now (no UI yet).
-  final GetDeviceInfoUsecase _getDeviceInfo;
-  final ObserveDeviceInfoChangedUsecase _observeDeviceInfoChanged;
+  final DeviceRepository _deviceRepository;
 
   StreamSubscription<bool>? _connectionSubscription;
   StreamSubscription<String>? _scanSubscription;
@@ -48,7 +45,7 @@ class ScannerCubit extends Cubit<ScannerState> {
   /// connection check is done through logcat (tag `QrReader`).
   Future<void> _loadDeviceInfo() async {
     try {
-      final device = await _getDeviceInfo();
+      final device = await _deviceRepository.getDeviceInfo();
       if (isClosed) return;
       Log.i('QrReader', 'Device info loaded: $device');
     } catch (e) {
